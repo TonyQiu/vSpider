@@ -9,21 +9,26 @@ public class ContentColumn {
 	boolean needImageExtracted;
 	String imageSelector;
 	
-	public ContentColumn(String name, String cssSelector) {
+	String parentUrl;
+	
+	public ContentColumn(String parentUrl, String name, String cssSelector) {
 		super();
+		this.parentUrl = parentUrl;
 		this.name = name;
 		this.cssSelector = cssSelector;
 		this.type = ColumnType.TEXT;
 	}
 
-	public ContentColumn(String name, String cssSelector, ColumnType type) {
+	public ContentColumn(String parentUrl, String name, String cssSelector, ColumnType type) {
 		super();
+		this.parentUrl = parentUrl;
 		this.name = name;
 		this.cssSelector = cssSelector;
 		this.type = type;
 	}
-	public ContentColumn(String name, String cssSelector, ColumnType type, boolean needImageExtracted, String imageSelector) {
+	public ContentColumn(String parentUrl, String name, String cssSelector, ColumnType type, boolean needImageExtracted, String imageSelector) {
 		super();
+		this.parentUrl = parentUrl;
 		this.name = name;
 		this.cssSelector = cssSelector;
 		this.type = type;

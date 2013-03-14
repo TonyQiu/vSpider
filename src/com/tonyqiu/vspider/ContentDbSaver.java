@@ -7,7 +7,6 @@ public class ContentDbSaver implements Runnable{
 
 	public void run() {
 		List<List<ContentColumn>> listToSaved = null;
-		App.STATUS.addContentDbSaverRunning(Thread.currentThread());
 		while(App.columnsList.isEmpty() == false || App.STATUS.isDetailPageThreadRunning()) {
 			if(App.columnsList.size() < JobConfig.oneBatchColumnsToSaveDb
 					) {
@@ -45,8 +44,6 @@ public class ContentDbSaver implements Runnable{
 			}
 			
 		}
-		
-		App.STATUS.removeContentDbSaverRunning(Thread.currentThread());
 		
 	}
 }
