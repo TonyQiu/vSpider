@@ -1,9 +1,5 @@
 package com.tonyqiu.vspider;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.internal.matchers.IsCollectionContaining;
 
 class AppStatus {
 //	public static int ALL_THREAD_STOP= 0x0;
@@ -11,83 +7,48 @@ class AppStatus {
 //	public static int DETAIL_PAGE_THREAD_RUNNING = 0x2;
 //	public static int IMAGE_DOWNLOAD_THREAD_RUNNING = 0x4;
 	
-	private int listPageThreadRunning = 0;
-	private Set<Thread> listPageRunningThreadSet = new HashSet<Thread>();
+	private Integer listPageThreadRunning = 0;
 	
-	private int detailPageThreadRunning = 0;
-	private Set<Thread> detailPageRunningThreadSet = new HashSet<Thread>();
+	private Integer detailPageThreadRunning = 0;
 	
-	private int imageDownloadThreadRunning = 0;
-	private Set<Thread> imageDownloadRunningThreadSet = new HashSet<Thread>();
+	private Integer imageDownloadThreadRunning = 0;
 	
-	private int contentDbSaverRunning = 0;
-	private Set<Thread> contentDbSaverRunningThreadSet = new HashSet<Thread>();
+	private Integer contentDbSaverRunning = 0;
 	
-	public boolean isListPageThreadRunning() {
+	public synchronized boolean isListPageThreadRunning() {
+		listPageThreadRunning = 0;
+		for(Thread t: App.listThreadList) {
+			if(t.isAlive()) {
+				listPageThreadRunning +=1;
+			}
+		}
 		return listPageThreadRunning!=0;
 	}
-	public void addListPageThreadRunning(Thread t) {
-		if(!this.listPageRunningThreadSet.contains(t)) {
-			this.listPageRunningThreadSet.add(t);
-			this.listPageThreadRunning +=1;
+	public synchronized boolean isDetailPageThreadRunning() {
+		detailPageThreadRunning = 0;
+		for(Thread t: App.detailThreadList) {
+			if(t.isAlive()) {
+				detailPageThreadRunning +=1;
+			}
 		}
-	}
-	public void removeListPageThreadRunning(Thread t) {
-		if(this.listPageRunningThreadSet.contains(t)) {
-			this.listPageRunningThreadSet.remove(t);
-			this.listPageThreadRunning -=1;
-		}
-	}
-	public boolean isDetailPageThreadRunning() {
 		return detailPageThreadRunning != 0;
 	}
-	public void addDetailPageThreadRunning(Thread t) {
-		if(!this.detailPageRunningThreadSet.contains(t)) {
-			this.detailPageRunningThreadSet.add(t);
-			this.detailPageThreadRunning += 1;
-		
+	public synchronized boolean isImageDownloadThreadRunning() {
+		imageDownloadThreadRunning = 0;
+		for(Thread t: App.imageThreadList) {
+			if(t.isAlive()) {
+				imageDownloadThreadRunning +=1;
+			}
 		}
-	}
-	public void removeDetailPageThreadRunning(Thread t) {
-		if(this.detailPageRunningThreadSet.contains(t)) {
-			this.detailPageRunningThreadSet.remove(t);
-			this.detailPageThreadRunning -= 1;
-		
-		}
-	}
-	public boolean isImageDownloadThreadRunning() {
 		return imageDownloadThreadRunning !=0;
 	}
-	public void addImageDownloadThreadRunning(Thread t) {
-//		System.out.println(t);
-		if(!this.imageDownloadRunningThreadSet.contains(t)) {
-			this.imageDownloadRunningThreadSet.add(t);
-			this.imageDownloadThreadRunning += 1;
+	public synchronized boolean isContentDbSaverRunning() {
+		contentDbSaverRunning = 0;
+		for(Thread t: App.contentDbSaverThreadList) {
+			if(t.isAlive()) {
+				contentDbSaverRunning +=1;
+			}
 		}
-	}
-	public void removeImageDownloadThreadRunning(Thread t) {
-//		System.out.println(t);
-		if(this.imageDownloadRunningThreadSet.contains(t)) {
-			this.imageDownloadRunningThreadSet.remove(t);
-			this.imageDownloadThreadRunning -= 1;
-		}
-	}
-	
-	public void addContentDbSaverRunning(Thread t) {
-//		System.out.println(t);
-		if(!this.contentDbSaverRunningThreadSet.contains(t)) {
-			this.contentDbSaverRunningThreadSet.add(t);
-			this.contentDbSaverRunning += 1;
-		}
-	}
-	public void removeContentDbSaverRunning(Thread t) {
-//		System.out.println(t);
-		if(this.contentDbSaverRunningThreadSet.contains(t)) {
-			this.contentDbSaverRunningThreadSet.remove(t);
-			this.contentDbSaverRunning -= 1;
-		}
-	}
-	public boolean isContentDbSaverRunning() {
 		return contentDbSaverRunning !=0;
 	}
 	public boolean isAllThreadStop() {

@@ -21,7 +21,6 @@ public class ContentExtractor implements Runnable{
 	
 	@Override
 	public void run() {
-		App.STATUS.addDetailPageThreadRunning(Thread.currentThread());
 		while(true) {
 				
 				if(App.detailUrlQueue.isEmpty()
@@ -42,10 +41,10 @@ public class ContentExtractor implements Runnable{
 				Document detailDoc = Jsoup.parse(new URL(url.url),App.HTTP_TIME_OUT);
 				
 				columns = new ArrayList<ContentColumn>();
-				columns.add(new ContentColumn("title", "h1#h1title"));
-				columns.add(new ContentColumn("time", "div.endContent span.info span",ColumnType.TIMESTAMP));
-				columns.add(new ContentColumn("summury", "div.endContent p.summary"));
-				columns.add(new ContentColumn("content", "div.ep-content-main div#endText",ColumnType.HTML,true,"img"));
+				columns.add(new ContentColumn(url.url,"title", "h1#h1title"));
+				columns.add(new ContentColumn(url.url,"time", "div.endContent span.info span",ColumnType.TIMESTAMP));
+				columns.add(new ContentColumn(url.url,"summury", "div.endContent p.summary"));
+				columns.add(new ContentColumn(url.url,"content", "div.ep-content-main div#endText",ColumnType.HTML,true,"img"));
 				for(ContentColumn col : columns) {
 					//是否要剥离图片
 					if(col.needImageExtracted) {
@@ -85,7 +84,6 @@ public class ContentExtractor implements Runnable{
 			}
 		}
 		
-		App.STATUS.removeDetailPageThreadRunning(Thread.currentThread());
 			
 	}
 }
