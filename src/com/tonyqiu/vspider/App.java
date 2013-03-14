@@ -1,20 +1,18 @@
 package com.tonyqiu.vspider;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.apache.commons.dbutils.DbUtils;
 
 public class App {
 
-	public static List<String> historyUrls = new ArrayList<String>();
+	public static Set<String> historyUrls = new HashSet<String>();
 	public static ConcurrentLinkedQueue<SpiderUrl> detailUrlQueue = new ConcurrentLinkedQueue<SpiderUrl>();
 	public static ConcurrentLinkedQueue<Image> imageQueue = new ConcurrentLinkedQueue<Image>();
+	public static List<Thread> listThreadList = new ArrayList<Thread>(); 
 	public static List<Thread> detailThreadList = new ArrayList<Thread>(); 
 	public static List<Thread> imageThreadList = new ArrayList<Thread>(); 
 	public static List<Thread> contentDbSaverThreadList = new ArrayList<Thread>();
@@ -35,7 +33,11 @@ public class App {
 		
 		//做法2：自己开线程
 		ListPageBreaker lpb = new ListPageBreaker();
-		new Thread(lpb).start();
+		for( int i=0; i<1; i++) {
+			Thread t = new Thread(lpb);
+			t.start();
+			listThreadList.add(t);
+		}
 		
 		ContentExtractor ce = new ContentExtractor();
 		for(int i=0; i<=4; i++) {
@@ -52,7 +54,7 @@ public class App {
 		}
 		
 		ContentDbSaver cd = new ContentDbSaver();
-		for(int i=0; i<=0;i ++) {
+		for (int i = 0; i < 1; i++) {
 			Thread t = new Thread(cd);
 			t.start();
 			contentDbSaverThreadList.add(t);

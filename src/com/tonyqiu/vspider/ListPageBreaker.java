@@ -2,6 +2,7 @@ package com.tonyqiu.vspider;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,7 +18,8 @@ public class ListPageBreaker implements Runnable{
 	
 	public ListPageBreaker() {
 		try {
-			
+			List<String> historyUrlInDb = DbHelper.getHitoryUrl();
+			App.historyUrls.addAll(historyUrlInDb);
 			d = Jsoup.parse(new URL(JobConfig.listPageUrl),App.HTTP_TIME_OUT);
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -27,13 +29,11 @@ public class ListPageBreaker implements Runnable{
 	@Override
 	public void run() {
 		try {
-			App.STATUS.addListPageThreadRunning(Thread.currentThread());
 			try {
 				extractDetailUrlFromListPage(d, recursive);
 			}catch(Exception e) {
 				e.printStackTrace();
 			}
-			App.STATUS.removeListPageThreadRunning(Thread.currentThread());
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -43,9 +43,7 @@ public class ListPageBreaker implements Runnable{
 		Elements els =listPageDoc.select(JobConfig.detailAnchorSelector);
 		for(Element e : els) {
 			String href =e.attr("href");
-			if(!App.detailUrlQueue.contains(href)
-					&& !App.historyUrls.contains(href)
-					) {
+			if(!App.historyUrls.contains(href)) {
 				App.detailUrlQueue.add(new SpiderUrl(href));
 				App.historyUrls.add(href);
 			}

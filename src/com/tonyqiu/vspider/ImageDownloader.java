@@ -12,10 +12,11 @@ public class ImageDownloader implements Runnable{
 	public ImageDownloader() {
 	}
 	
+	/**
+	 * TODO 添加功能，图片获取失败自动重试
+	 */
 	@Override
 	public void run() {
-		
-		App.STATUS.addImageDownloadThreadRunning(Thread.currentThread());
 		
 		while(true) {
 			try {
@@ -40,6 +41,7 @@ public class ImageDownloader implements Runnable{
 				}
 				file.getParentFile().mkdirs();
 				URLConnection con = new URL(image.getUrl()).openConnection();
+				con.setReadTimeout(10 * 1000);
 				FileUtils.copyInputStreamToFile(con.getInputStream(), file);
 				
 			}catch(Exception e) {
@@ -47,6 +49,5 @@ public class ImageDownloader implements Runnable{
 			}
 		}
 		
-		App.STATUS.removeImageDownloadThreadRunning(Thread.currentThread());
 	}
 }
