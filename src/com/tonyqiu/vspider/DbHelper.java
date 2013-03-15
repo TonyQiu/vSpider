@@ -6,11 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 
 public class DbHelper {
 	private static Connection conn = null;  
@@ -82,5 +84,17 @@ public class DbHelper {
 			}
 		};
 		return run.query(getConnection(),sql, h);
+	}
+	
+	public static List<Map<String, Object>> getJobConfig() throws SQLException {
+		String sql="SELECT * FROM job where is_del =0";
+		QueryRunner run = new QueryRunner();
+		return run.query(getConnection(), sql, new MapListHandler());
+	}
+	
+	public static List<Map<String, Object>> getJobColumnConfig(Integer jobId) throws SQLException {
+		String sql="SELECT * FROM column_config where job_id=? and is_del =0";
+		QueryRunner run = new QueryRunner();
+		return run.query(getConnection(), sql,new MapListHandler(),jobId);
 	}
 }

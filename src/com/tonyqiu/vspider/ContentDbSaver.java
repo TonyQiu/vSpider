@@ -8,7 +8,7 @@ public class ContentDbSaver implements Runnable{
 	public void run() {
 		List<List<ContentColumn>> listToSaved = null;
 		while(App.columnsList.isEmpty() == false || App.STATUS.isDetailPageThreadRunning()) {
-			if(App.columnsList.size() < JobConfig.oneBatchColumnsToSaveDb
+			if(App.columnsList.size() < App.jobConfig.oneBatchColumnsToSaveDb
 					) {
 				if(App.STATUS.isDetailPageThreadRunning()) {
 					try {
@@ -30,7 +30,7 @@ public class ContentDbSaver implements Runnable{
 				
 				//加锁,以免不同步
 				synchronized (App.columnsList) {
-					List<List<ContentColumn>> tmpList = App.columnsList.subList(0, JobConfig.oneBatchColumnsToSaveDb);
+					List<List<ContentColumn>> tmpList = App.columnsList.subList(0, App.jobConfig.oneBatchColumnsToSaveDb);
 					listToSaved = new ArrayList<List<ContentColumn>>(tmpList);
 					tmpList.clear();
 				}

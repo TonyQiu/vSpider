@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.apache.commons.beanutils.BeanUtils;
 
 public class App {
 
@@ -21,7 +24,18 @@ public class App {
 	
 	public static List<List<ContentColumn>> columnsList = Collections.synchronizedList(new ArrayList<List<ContentColumn>>());
 	
+	public static JobConfig jobConfig = new JobConfig();
+	
 	public static void main(String[] args) {
+		new App();
+	}
+	
+	/**
+	 * 程序初始化
+	 */
+	public App() {
+		
+		initJobConfig();
 		
 		//初始化historyUrls，把历史记录都装载进来。
 		
@@ -63,5 +77,35 @@ public class App {
 		new Thread(new Reporter()).start();
 	}
 	
+	private void initJobConfig() {
+		try {
+			List<Map<String, Object>> configs = DbHelper.getJobConfig();
+			Map<String, Object> map = configs.get(0);
+			
+			
+			for(String key : map.keySet()) {
+				Object value = map.get(key);
+				key = StringHelper.makeAllWordFirstLetterUpperCase(key);
+				key = StringHelper.uncapitalize(key);
+				BeanUtils.setProperty(App.jobConfig, key, value);
+			}
+			
+			//初始化列
+			List<Map<String, Object>> columnConfigList = DbHelper.getJobColumnConfig(App.jobConfig.jobId);
+			for(Map<String, Object> columnConfigMap : columnConfigList) {
+				ContentColumn contentColumn = new ContentColumn();
+				for(String key : columnConfigMap.keySet()) {
+					Object value = columnConfigMap.get(key);
+					key = StringHelper.makeAllWordFirstLetterUpperCase(key);
+					key = StringHelper.uncapitalize(key);
+					BeanUtils.setProperty(contentColumn, key, value);
+				}
+				App.jobConfig.columns.add(contentColumn);
+			}
+			System.out.println("初始化成功:"+App.jobConfig);
+		}catch(Exception e) { //TODO 处理异常
+			e.printStackTrace();
+		}
+	}
  
 }

@@ -20,7 +20,7 @@ public class ListPageBreaker implements Runnable{
 		try {
 			List<String> historyUrlInDb = DbHelper.getHitoryUrl();
 			App.historyUrls.addAll(historyUrlInDb);
-			d = Jsoup.parse(new URL(JobConfig.listPageUrl),App.HTTP_TIME_OUT);
+			d = Jsoup.parse(new URL(App.jobConfig.listPageUrl),App.HTTP_TIME_OUT);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -40,7 +40,7 @@ public class ListPageBreaker implements Runnable{
 	}
 	
 	private void extractDetailUrlFromListPage(Document listPageDoc, boolean recursive) throws IOException{
-		Elements els =listPageDoc.select(JobConfig.detailAnchorSelector);
+		Elements els =listPageDoc.select(App.jobConfig.detailAnchorSelector);
 		for(Element e : els) {
 			String href =e.attr("href");
 			if(!App.historyUrls.contains(href)) {
@@ -48,7 +48,7 @@ public class ListPageBreaker implements Runnable{
 				App.historyUrls.add(href);
 			}
 		}
-		Elements nextPageEls = listPageDoc.select(JobConfig.nextPageSelector);
+		Elements nextPageEls = listPageDoc.select(App.jobConfig.nextPageSelector);
 		if(recursive == false  
 				|| nextPageEls.isEmpty()
 				|| ! nextPageEls.first().attr("href").startsWith("http://")

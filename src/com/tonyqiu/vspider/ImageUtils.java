@@ -6,7 +6,11 @@ public class ImageUtils {
 
 	private static String allowImageExt=",bmp,gif,jpg,jpeg,jpe,png,tif,";
 	
-	public static Image reverImage(String originalImgUrl) {
+	public static Image reverImage(String originalImgUrl, 
+			String imageSrcBaseUrl, 
+			String imageTargetBaseUrl,
+			String localImageFolder
+			) {
 		String ext = "jpg";
 		if(StringUtils.isBlank(originalImgUrl)) {
 			return null;
@@ -20,7 +24,7 @@ public class ImageUtils {
 		}
 		
 		if(!StringUtils.startsWithAny(originalImgUrl, "http://","https://")) {
-			originalImgUrl = JobConfig.imageSrcBaseUrl + originalImgUrl;
+			originalImgUrl = imageSrcBaseUrl + originalImgUrl;
 		}
 		
 		//get file url
@@ -32,6 +36,6 @@ public class ImageUtils {
 		String targetUrl = fstDir + "/" + secDir +"/" + thrDir + "/" + md5Str + "." + ext;
 		
 		
-		return new Image(originalImgUrl, JobConfig.imageTargetBaseUrl + targetUrl, JobConfig.localImageFolder + targetUrl);
+		return new Image(originalImgUrl, imageTargetBaseUrl + targetUrl, localImageFolder + targetUrl);
 	}
 }

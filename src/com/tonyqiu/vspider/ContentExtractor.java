@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,8 +14,6 @@ import org.jsoup.select.Elements;
 
 public class ContentExtractor implements Runnable{
 
-	
-	private List<ContentColumn> columns ;
 	
 	public ContentExtractor() {
 	}
@@ -29,29 +28,32 @@ public class ContentExtractor implements Runnable{
 				}
 			
 			
-			SpiderUrl url = null;
+			SpiderUrl spiderUrl = null;
 			
 			try {
 				if(App.detailUrlQueue.isEmpty()){
 					Thread.sleep(1000l);
 					continue;
 				}
-				url = App.detailUrlQueue.poll();
+				spiderUrl = App.detailUrlQueue.poll();
 				
-				Document detailDoc = Jsoup.parse(new URL(url.url),App.HTTP_TIME_OUT);
+				Document detailDoc = Jsoup.parse(new URL(spiderUrl.url),App.HTTP_TIME_OUT);
 				
-				columns = new ArrayList<ContentColumn>();
-				columns.add(new ContentColumn(url.url,"title", "h1#h1title"));
-				columns.add(new ContentColumn(url.url,"time", "div.endContent span.info span",ColumnType.TIMESTAMP));
-				columns.add(new ContentColumn(url.url,"summury", "div.endContent p.summary"));
-				columns.add(new ContentColumn(url.url,"content", "div.ep-content-main div#endText",ColumnType.HTML,true,"img"));
-				for(ContentColumn col : columns) {
+				List<ContentColumn> colList = new ArrayList<ContentColumn>();
+				for(ContentColumn colConf : App.jobConfig.columns) {
+					ContentColumn col = new ContentColumn();
+					BeanUtils.copyProperties(col, colConf);
+					col.setParentUrl(spiderUrl.url);
 					//是否要剥离图片
 					if(col.needImageExtracted) {
 						Elements imageEles = detailDoc.select(col.imageSelector);
 						if(imageEles.isEmpty() == false) {
 							for(Element imageEle : imageEles) {
-								Image image = ImageUtils.reverImage(imageEle.attr("src"));
+								Image image = ImageUtils.reverImage(imageEle.attr("src"),
+										col.imageSrcBaseUrl,
+										col.imageTargetBaseUrl,
+										col.localImageFolder
+										);
 								if(image != null) {
 									App.imageQueue.add(image);
 									imageEle.attr("src", image.getMyUrl());
@@ -70,14 +72,15 @@ public class ContentExtractor implements Runnable{
 						
 						
 					}
+					colList.add(col);
 				}
 				//加锁，以免不同步
 				synchronized (App.columnsList) {
-					App.columnsList.add(columns);
+					App.columnsList.add(colList);
 				}
 			}catch(SocketTimeoutException ste) {
-				url.tryTimes += 1;
-				App.detailUrlQueue.add(url);
+				spiderUrl.tryTimes += 1;
+				App.detailUrlQueue.add(spiderUrl);
 			}catch(Exception e) {
 				e.printStackTrace();
 				return;
